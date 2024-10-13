@@ -192,8 +192,6 @@ paths:
                 $ref: "#/components/schemas/Participations"
         "404":
           description: Not found
-      security:
-        - sport_matchmaking_auth: []
     post:
       tags:
         - participation
