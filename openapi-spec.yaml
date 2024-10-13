@@ -1,0 +1,331 @@
+openapi: 3.1.0
+info:
+  title: Sport Matchmaking Match Service
+  description: |-
+    Service for querying and modifying matches, as well as joining them.
+  version: 0.1.0
+
+tags:
+  - name: match
+    description: Operations for querying, creating, and modifying matches
+  - name: participation
+    description: Operations involving match participation
+paths:
+  /matches:
+    get:
+      tags:
+        - match
+      summary: Gets matches
+      description: |-
+        Finds matches.
+
+        The "recommended" query param filters matches based on the user's preferences.
+        When the recommended query parameter is set, authentication is required.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 25
+        - in: query
+          name: recommended
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Matches"
+        "401":
+          description: Unauthorized
+      security:
+        - sport_matchmaking_auth: []
+    post:
+      tags:
+        - match
+      summary: Create a new match
+      requestBody:
+        description: |-
+          Creates a new match. User ID is parsed from the
+          authentication token.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchCreate"
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Match"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "422":
+          description: Validation error
+      security:
+        - sport_matchmaking_auth: []
+
+  /matches/{id}:
+    get:
+      tags:
+        - match
+      summary: Find an existing match
+      description: Find match by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Match"
+        "404":
+          description: Not found
+    put:
+      tags:
+        - match
+      summary: Modifies an existing match
+      description: Edit an existing match by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Edit an existing match
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchEdit"
+      responses:
+        "204":
+          description: Successful operation
+        "400":
+          description: Invalid data
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "422":
+          description: Validation error
+      security:
+        - sport_matchmaking_auth: []
+    delete:
+      tags:
+        - match
+      summary: Deletes an existing match
+      description: Delete an existing match by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Successful operation
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+      security:
+        - sport_matchmaking_auth: []
+
+  /matches/{id}/participants:
+    get:
+      tags:
+        - participation
+        - match
+      summary: Gets participants in an activity
+      description: Get participants by activity ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 25
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Participations"
+        "404":
+          description: Not found
+      security:
+        - sport_matchmaking_auth: []
+    post:
+      tags:
+        - participation
+      summary: Creates a new participation, joining the identified user to the match
+      description: Creates a new participation
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Participation"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Match not found
+      security:
+        - sport_matchmaking_auth: []
+
+components:
+  schemas:
+    Match:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sport:
+          type: string
+        participantCount:
+          type: integer
+        minParticipants:
+          type: [integer, "null"]
+          minimum: 2
+        maxParticipants:
+          type: [integer, "null"]
+          minimum: 2
+        startsAt:
+          type: string
+          format: "date-time"
+        endsAt:
+          type: string
+          format: "date-time"
+        location:
+          type: string
+        description:
+          type: string
+        participationFee:
+          type: integer
+          minimum: 0
+        requiredEquipment:
+          type: array
+          items:
+            type: string
+        level:
+          type: string
+        chatLink:
+          type: string
+        hostUserId:
+          type: string
+        createdAt:
+          type: string
+          format: "date-time"
+        updatedAt:
+          type: string
+          format: "date-time"
+
+    Matches:
+      type: array
+      items:
+        $ref: "#/components/schemas/Match"
+
+    MatchCreate:
+      type: object
+      properties:
+        sport:
+          type: string
+          maxLength: 50
+        minParticipants:
+          type: [integer, "null"]
+          minimum: 2
+        maxParticipants:
+          type: [integer, "null"]
+          minimum: 2
+        startsAt:
+          type: string
+          format: "date-time"
+        endsAt:
+          type: string
+          format: "date-time"
+        location:
+          type: string
+        description:
+          type: string
+        participationFee:
+          type: integer
+          minimum: 0
+        requiredEquipment:
+          type: array
+          items:
+            type: string
+        level:
+          type: string
+        chatLink:
+          type: string
+
+    MatchEdit:
+      type: object
+      $ref: "#/components/schemas/MatchCreate"
+
+    Participation:
+      type: object
+      properties:
+        userId:
+          type: string
+        matchId:
+          type: string
+        createdAt:
+          type: string
+          format: "date-time"
+        updatedAt:
+          type: string
+          format: "date-time"
+
+    Participations:
+      type: array
+      items:
+        $ref: "#/components/schemas/Participation"
+
+  securitySchemes:
+    sport_matchmaking_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      in: header
