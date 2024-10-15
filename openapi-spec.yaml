@@ -266,6 +266,15 @@ components:
 
     MatchCreate:
       type: object
+      required:
+        - sport
+        - startsAt
+        - endsAt
+        - location
+        - description
+        - participationFee
+        - level
+        - chatLink
       properties:
         sport:
           type: string
@@ -284,8 +293,10 @@ components:
           format: "date-time"
         location:
           type: string
+          maxLength: 100
         description:
           type: string
+          maxLength: 1000
         participationFee:
           type: integer
           minimum: 0
@@ -293,10 +304,13 @@ components:
           type: array
           items:
             type: string
+            maxLength: 100
         level:
           type: string
+          maxLength: 100
         chatLink:
           type: string
+          maxLength: 200
 
     MatchEdit:
       type: object
