@@ -57,3 +57,5 @@ type MatchCreate struct {
 	Level             string    `json:"level" validate:"required,max=100"`
 	ChatLink          string    `json:"chatLink" validate:"required,max=200"`
 }
+
+type MatchEdit MatchCreate
