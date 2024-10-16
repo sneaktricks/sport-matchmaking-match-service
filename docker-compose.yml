@@ -1,6 +1,10 @@
-version: '3.4'
-
 services:
+  database:
+    container_name: match-service-postgres
+    image: postgres:17.0
+    shm_size: 128mb
+    env_file:
+      - dev.env
   sportmatchmakingmatchservice:
     image: sportmatchmakingmatchservice
     build:
@@ -8,3 +12,6 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 8080:8080
+    env_file:
+      - dev.env
+    restart: on-failure

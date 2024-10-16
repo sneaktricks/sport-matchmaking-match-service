@@ -9,6 +9,7 @@ func New() *echo.Echo {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.BodyLimit("2M"))
+	e.Use(middleware.Logger())
 	e.Validator = NewValidator()
 
 	return e

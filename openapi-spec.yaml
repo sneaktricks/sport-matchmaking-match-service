@@ -4,12 +4,14 @@ info:
   description: |-
     Service for querying and modifying matches, as well as joining them.
   version: 0.1.0
-
 tags:
   - name: match
     description: Operations for querying, creating, and modifying matches
   - name: participation
     description: Operations involving match participation
+servers:
+  - url: http://localhost:8080
+
 paths:
   /matches:
     get:

@@ -9,6 +9,10 @@ import (
 	"github.com/sneaktricks/sport-matchmaking-match-service/store"
 )
 
+var (
+	ErrInvalidID = errors.New("invalid ID")
+)
+
 type validationErrors struct {
 	Errors map[string]string `json:"errors"`
 }
@@ -40,6 +44,9 @@ func HTTPError(err error) *echo.HTTPError {
 	default:
 		if errors.Is(err, store.ErrMatchNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		}
+		if errors.Is(err, ErrInvalidID) {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}

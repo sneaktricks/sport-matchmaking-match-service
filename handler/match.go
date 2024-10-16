@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -34,6 +35,8 @@ func (h *Handler) FindMatches(c echo.Context) error {
 		c.Request().Context(),
 		queryParams.Page,
 		queryParams.Limit,
+		nil,
+		time.UnixMilli(0),
 	)
 	if err != nil {
 		return HTTPError(err)
@@ -47,7 +50,7 @@ func (h *Handler) FindMatchByID(c echo.Context) error {
 	var id uuid.UUID
 	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &id).BindError()
 	if err != nil {
-		return HTTPError(err)
+		return HTTPError(ErrInvalidID)
 	}
 
 	// Find match by ID
@@ -93,7 +96,7 @@ func (h *Handler) EditMatch(c echo.Context) error {
 	var id uuid.UUID
 	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &id).BindError()
 	if err != nil {
-		return HTTPError(err)
+		return HTTPError(ErrInvalidID)
 	}
 
 	editData := model.MatchEdit{}
@@ -126,7 +129,7 @@ func (h *Handler) DeleteMatch(c echo.Context) error {
 	var id uuid.UUID
 	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &id).BindError()
 	if err != nil {
-		return HTTPError(err)
+		return HTTPError(ErrInvalidID)
 	}
 
 	err = h.matchStore.Delete(

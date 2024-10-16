@@ -25,6 +25,26 @@ type Match struct {
 	HostUserID        uuid.UUID
 }
 
+func (m *Match) MatchDTO() MatchDTO {
+	return MatchDTO{
+		ID:                m.ID,
+		Sport:             m.Sport,
+		MinParticipants:   m.MinParticipants,
+		MaxParticipants:   m.MaxParticipants,
+		StartsAt:          m.StartsAt,
+		EndsAt:            m.EndsAt,
+		Location:          m.Location,
+		Description:       m.Description,
+		ParticipationFee:  m.ParticipationFee,
+		RequiredEquipment: m.RequiredEquipment,
+		Level:             m.Level,
+		ChatLink:          m.ChatLink,
+		HostUserID:        m.HostUserID,
+		CreatedAt:         m.CreatedAt,
+		UpdatedAt:         m.UpdatedAt,
+	}
+}
+
 type MatchDTO struct {
 	ID                uuid.UUID `json:"id"`
 	Sport             string    `json:"sport"`
@@ -58,4 +78,36 @@ type MatchCreate struct {
 	ChatLink          string    `json:"chatLink" validate:"required,max=200"`
 }
 
+func (mc *MatchCreate) Match() Match {
+	return Match{
+		Sport:             mc.Sport,
+		MinParticipants:   mc.MinParticipants,
+		MaxParticipants:   mc.MaxParticipants,
+		StartsAt:          mc.StartsAt,
+		EndsAt:            mc.EndsAt,
+		Location:          mc.Location,
+		Description:       mc.Description,
+		ParticipationFee:  mc.ParticipationFee,
+		RequiredEquipment: mc.RequiredEquipment,
+		Level:             mc.Level,
+		ChatLink:          mc.ChatLink,
+	}
+}
+
 type MatchEdit MatchCreate
+
+func (me *MatchEdit) Match() Match {
+	return Match{
+		Sport:             me.Sport,
+		MinParticipants:   me.MinParticipants,
+		MaxParticipants:   me.MaxParticipants,
+		StartsAt:          me.StartsAt,
+		EndsAt:            me.EndsAt,
+		Location:          me.Location,
+		Description:       me.Description,
+		ParticipationFee:  me.ParticipationFee,
+		RequiredEquipment: me.RequiredEquipment,
+		Level:             me.Level,
+		ChatLink:          me.ChatLink,
+	}
+}
