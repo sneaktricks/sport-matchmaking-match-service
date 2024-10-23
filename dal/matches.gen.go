@@ -43,6 +43,11 @@ func newMatch(db *gorm.DB, opts ...gen.DOOption) match {
 	_match.Level = field.NewString(tableName, "level")
 	_match.ChatLink = field.NewString(tableName, "chat_link")
 	_match.HostUserID = field.NewField(tableName, "host_user_id")
+	_match.Participations = matchHasManyParticipations{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Participations", "model.Participation"),
+	}
 
 	_match.fillFieldMap()
 
@@ -69,6 +74,7 @@ type match struct {
 	Level             field.String
 	ChatLink          field.String
 	HostUserID        field.Field
+	Participations    matchHasManyParticipations
 
 	fieldMap map[string]field.Expr
 }
@@ -125,7 +131,7 @@ func (m *match) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (m *match) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 16)
+	m.fieldMap = make(map[string]field.Expr, 17)
 	m.fieldMap["id"] = m.ID
 	m.fieldMap["created_at"] = m.CreatedAt
 	m.fieldMap["updated_at"] = m.UpdatedAt
@@ -142,6 +148,7 @@ func (m *match) fillFieldMap() {
 	m.fieldMap["level"] = m.Level
 	m.fieldMap["chat_link"] = m.ChatLink
 	m.fieldMap["host_user_id"] = m.HostUserID
+
 }
 
 func (m match) clone(db *gorm.DB) match {
@@ -152,6 +159,77 @@ func (m match) clone(db *gorm.DB) match {
 func (m match) replaceDB(db *gorm.DB) match {
 	m.matchDo.ReplaceDB(db)
 	return m
+}
+
+type matchHasManyParticipations struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a matchHasManyParticipations) Where(conds ...field.Expr) *matchHasManyParticipations {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a matchHasManyParticipations) WithContext(ctx context.Context) *matchHasManyParticipations {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a matchHasManyParticipations) Session(session *gorm.Session) *matchHasManyParticipations {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a matchHasManyParticipations) Model(m *model.Match) *matchHasManyParticipationsTx {
+	return &matchHasManyParticipationsTx{a.db.Model(m).Association(a.Name())}
+}
+
+type matchHasManyParticipationsTx struct{ tx *gorm.Association }
+
+func (a matchHasManyParticipationsTx) Find() (result []*model.Participation, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a matchHasManyParticipationsTx) Append(values ...*model.Participation) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a matchHasManyParticipationsTx) Replace(values ...*model.Participation) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a matchHasManyParticipationsTx) Delete(values ...*model.Participation) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a matchHasManyParticipationsTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a matchHasManyParticipationsTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type matchDo struct{ gen.DO }

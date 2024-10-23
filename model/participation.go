@@ -13,6 +13,15 @@ type Participation struct {
 	MatchID uuid.UUID `gorm:"type:uuid;primaryKey"`
 }
 
+func (p *Participation) ParticipationDTO() ParticipationDTO {
+	return ParticipationDTO{
+		UserID:    p.UserID,
+		MatchID:   p.MatchID,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
 type ParticipationDTO struct {
 	UserID  uuid.UUID `json:"userId"`
 	MatchID uuid.UUID `json:"matchId"`

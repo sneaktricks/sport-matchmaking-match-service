@@ -31,11 +31,12 @@ func main() {
 
 	// Create stores
 	matchStore := store.NewGormMatchStore(dal.Q)
+	participationStore := store.NewGormParticipationStore(dal.Q)
 
 	// Create router and handler
 	r := router.New()
 	g := r.Group("")
-	h := handler.New(matchStore)
+	h := handler.New(matchStore, participationStore)
 
 	// Register routes to router main group
 	h.RegisterRoutes(g)

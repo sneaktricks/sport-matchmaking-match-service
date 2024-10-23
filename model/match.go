@@ -23,6 +23,7 @@ type Match struct {
 	Level             string
 	ChatLink          string
 	HostUserID        uuid.UUID
+	Participations    []Participation `gorm:"foreignKey:MatchID"`
 }
 
 func (m *Match) MatchDTO() MatchDTO {

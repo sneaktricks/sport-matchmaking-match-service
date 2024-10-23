@@ -10,12 +10,14 @@ import (
 )
 
 type Handler struct {
-	matchStore store.MatchStore
+	matchStore         store.MatchStore
+	participationStore store.ParticipationStore
 }
 
-func New(ms store.MatchStore) *Handler {
+func New(ms store.MatchStore, ps store.ParticipationStore) *Handler {
 	return &Handler{
-		matchStore: ms,
+		matchStore:         ms,
+		participationStore: ps,
 	}
 }
 
@@ -34,4 +36,8 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 	matchGroup.POST("", h.CreateMatch)
 	matchGroup.PUT("/:id", h.EditMatch)
 	matchGroup.DELETE("/:id", h.DeleteMatch)
+
+	matchGroup.GET("/:id/participants", h.FindParticipationsInMatch)
+	matchGroup.POST("/:id/participants", h.CreateParticipation)
+	matchGroup.DELETE("/:id/participants", h.DeleteParticipation)
 }
