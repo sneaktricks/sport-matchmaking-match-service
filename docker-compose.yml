@@ -5,8 +5,8 @@ services:
     shm_size: 128mb
     env_file:
       - dev.env
-  sportmatchmakingmatchservice:
-    image: sportmatchmakingmatchservice
+  sport-matchmaking-match-service:
+    image: sport-matchmaking-match-service
     build:
       context: .
       dockerfile: ./Dockerfile
