@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sport-matchmaking-match-service
+spec:
+  selector:
+    matchLabels:
+      app: sport-matchmaking-match-service
+  template:
+    metadata:
+      labels:
+        app: sport-matchmaking-match-service
+    spec:
+      containers:
+      - name: sport-matchmaking-match-service
+        image: sport-matchmaking-match-service:latest
+        imagePullPolicy: Never
+        resources:
+          requests:
+            cpu: 100m
+            memory: "16Mi"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
+          - name: PGUSER
+            valueFrom:
+              secretKeyRef:
+                name: postgres-credentials
+                key: PGUSER
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-credentials
+                key: PGPASSWORD
+          - name: PGHOST
+            valueFrom:
+              secretKeyRef:
+                name: postgres-credentials
+                key: PGHOST
+          - name: PGPORT
+            valueFrom:
+              secretKeyRef:
+                name: postgres-credentials
+                key: PGPORT
+          - name: PGDATABASE
+            valueFrom:
+              secretKeyRef:
+                name: postgres-credentials
+                key: PGDATABASE
