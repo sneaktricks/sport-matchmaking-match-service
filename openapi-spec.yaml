@@ -217,6 +217,8 @@ paths:
           description: Unauthorized
         "404":
           description: Match not found
+        "409":
+          description: Match full or already participated
       security:
         - sport_matchmaking_auth: []
 

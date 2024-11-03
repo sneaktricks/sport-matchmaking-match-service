@@ -13,6 +13,7 @@ import (
 var (
 	ErrMatchFull             = errors.New("match is already full")
 	ErrParticipationNotFound = errors.New("participation not found")
+	ErrAlreadyParticipated   = errors.New("user has already participated in the match")
 )
 
 type ParticipationStore interface {
@@ -85,6 +86,10 @@ func (ps *GormParticipationStore) Create(ctx context.Context, matchID uuid.UUID,
 	dbParticipation := model.Participation{MatchID: matchID, UserID: userID}
 	err = p.WithContext(ctx).Create(&dbParticipation)
 	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			err = ErrAlreadyParticipated
+		}
+
 		return model.ParticipationDTO{}, err
 	}
 

@@ -45,6 +45,16 @@ func HTTPError(err error) *echo.HTTPError {
 		if errors.Is(err, store.ErrMatchNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, err.Error())
 		}
+		if errors.Is(err, store.ErrParticipationNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		}
+		if errors.Is(err, store.ErrMatchFull) {
+			return echo.NewHTTPError(http.StatusConflict, err.Error())
+		}
+		if errors.Is(err, store.ErrAlreadyParticipated) {
+			return echo.NewHTTPError(http.StatusConflict, err.Error())
+		}
+
 		if errors.Is(err, ErrInvalidID) {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
