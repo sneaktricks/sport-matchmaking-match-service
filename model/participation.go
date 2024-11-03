@@ -8,9 +8,21 @@ import (
 )
 
 type Participation struct {
-	gorm.Model
 	UserID  uuid.UUID `gorm:"type:uuid;primaryKey"`
 	MatchID uuid.UUID `gorm:"type:uuid;primaryKey"`
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+func (p *Participation) ParticipationDTO() ParticipationDTO {
+	return ParticipationDTO{
+		UserID:    p.UserID,
+		MatchID:   p.MatchID,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
 }
 
 type ParticipationDTO struct {

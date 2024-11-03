@@ -23,6 +23,7 @@ type Match struct {
 	Level             string
 	ChatLink          string
 	HostUserID        uuid.UUID
+	Participations    []Participation `gorm:"foreignKey:MatchID"`
 }
 
 func (m *Match) MatchDTO() MatchDTO {
@@ -72,7 +73,7 @@ type MatchCreate struct {
 	EndsAt            time.Time `json:"endsAt" validate:"required,gte,gtfield=StartsAt"`
 	Location          string    `json:"location" validate:"required,max=100"`
 	Description       string    `json:"description" validate:"required,max=1000"`
-	ParticipationFee  int64     `json:"participationFee" validate:"required,min=0"`
+	ParticipationFee  int64     `json:"participationFee" validate:"min=0"`
 	RequiredEquipment []string  `json:"requiredEquipment"`
 	Level             string    `json:"level" validate:"required,max=100"`
 	ChatLink          string    `json:"chatLink" validate:"required,max=200"`

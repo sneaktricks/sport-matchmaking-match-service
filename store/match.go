@@ -56,7 +56,8 @@ func (ms *GormMatchStore) FindAll(
 		Order(m.StartsAt.Asc())
 
 	// Query with pagination
-	dbMatches, _, err := builder.FindByPage(int((page-1)*limit), int(limit))
+	offset := (page - 1) * limit
+	dbMatches, _, err := builder.FindByPage(int(offset), int(limit))
 	if err != nil {
 		return nil, err
 	}
