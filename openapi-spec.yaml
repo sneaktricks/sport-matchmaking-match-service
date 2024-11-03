@@ -199,6 +199,13 @@ paths:
         - participation
       summary: Creates a new participation, joining the identified user to the match
       description: Creates a new participation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         "201":
           description: Successful operation
