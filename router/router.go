@@ -1,17 +1,21 @@
 package router
 
 import (
+	"github.com/Nerzal/gocloak/v13"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echomiddleware "github.com/labstack/echo/v4/middleware"
+	"github.com/sneaktricks/sport-matchmaking-match-service/middleware"
 )
 
-func New() *echo.Echo {
+func New(goCloakClient *gocloak.GoCloak) *echo.Echo {
 	e := echo.New()
-	e.Pre(middleware.RemoveTrailingSlash())
-	e.Use(middleware.BodyLimit("2M"))
-	e.Use(middleware.Logger())
-	e.Use(middleware.CORS()) // TODO: Configure CORS for production
+	e.Pre(echomiddleware.RemoveTrailingSlash())
+	e.Use(echomiddleware.BodyLimit("2M"))
+	e.Use(echomiddleware.Logger())
+	e.Use(echomiddleware.CORS()) // TODO: Configure CORS for production
 	e.Validator = NewValidator()
+
+	e.Use(middleware.AuthMiddleware(goCloakClient))
 
 	return e
 }

@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/sneaktricks/sport-matchmaking-match-service/auth"
 	"github.com/sneaktricks/sport-matchmaking-match-service/dal"
 	"github.com/sneaktricks/sport-matchmaking-match-service/database"
 	"github.com/sneaktricks/sport-matchmaking-match-service/handler"
@@ -33,8 +34,11 @@ func main() {
 	matchStore := store.NewGormMatchStore(dal.Q)
 	participationStore := store.NewGormParticipationStore(dal.Q)
 
+	// Create GoCloak client
+	goCloakClient := auth.NewGoCloakClient()
+
 	// Create router and handler
-	r := router.New()
+	r := router.New(goCloakClient)
 	g := r.Group("")
 	h := handler.New(matchStore, participationStore)
 
