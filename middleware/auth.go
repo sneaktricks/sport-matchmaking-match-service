@@ -36,7 +36,7 @@ func AuthMiddleware(client *gocloak.GoCloak) echo.MiddlewareFunc {
 			// Get user info
 			userInfo, err := client.GetUserInfo(ctx, token, auth.Realm)
 			if err != nil {
-				log.Logger.Error("Failed to get user info", slog.String("error", err.Error()))
+				log.Logger.Error("Failed to retrieve user info", slog.String("error", err.Error()))
 				return echo.ErrUnauthorized
 			}
 
