@@ -27,12 +27,11 @@ func newParticipation(db *gorm.DB, opts ...gen.DOOption) participation {
 
 	tableName := _participation.participationDo.TableName()
 	_participation.ALL = field.NewAsterisk(tableName)
-	_participation.ID = field.NewUint(tableName, "id")
+	_participation.UserID = field.NewField(tableName, "user_id")
+	_participation.MatchID = field.NewField(tableName, "match_id")
 	_participation.CreatedAt = field.NewTime(tableName, "created_at")
 	_participation.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_participation.DeletedAt = field.NewField(tableName, "deleted_at")
-	_participation.UserID = field.NewField(tableName, "user_id")
-	_participation.MatchID = field.NewField(tableName, "match_id")
 
 	_participation.fillFieldMap()
 
@@ -43,12 +42,11 @@ type participation struct {
 	participationDo participationDo
 
 	ALL       field.Asterisk
-	ID        field.Uint
+	UserID    field.Field
+	MatchID   field.Field
 	CreatedAt field.Time
 	UpdatedAt field.Time
 	DeletedAt field.Field
-	UserID    field.Field
-	MatchID   field.Field
 
 	fieldMap map[string]field.Expr
 }
@@ -65,12 +63,11 @@ func (p participation) As(alias string) *participation {
 
 func (p *participation) updateTableName(table string) *participation {
 	p.ALL = field.NewAsterisk(table)
-	p.ID = field.NewUint(table, "id")
+	p.UserID = field.NewField(table, "user_id")
+	p.MatchID = field.NewField(table, "match_id")
 	p.CreatedAt = field.NewTime(table, "created_at")
 	p.UpdatedAt = field.NewTime(table, "updated_at")
 	p.DeletedAt = field.NewField(table, "deleted_at")
-	p.UserID = field.NewField(table, "user_id")
-	p.MatchID = field.NewField(table, "match_id")
 
 	p.fillFieldMap()
 
@@ -99,13 +96,12 @@ func (p *participation) GetFieldByName(fieldName string) (field.OrderExpr, bool)
 }
 
 func (p *participation) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 6)
-	p.fieldMap["id"] = p.ID
+	p.fieldMap = make(map[string]field.Expr, 5)
+	p.fieldMap["user_id"] = p.UserID
+	p.fieldMap["match_id"] = p.MatchID
 	p.fieldMap["created_at"] = p.CreatedAt
 	p.fieldMap["updated_at"] = p.UpdatedAt
 	p.fieldMap["deleted_at"] = p.DeletedAt
-	p.fieldMap["user_id"] = p.UserID
-	p.fieldMap["match_id"] = p.MatchID
 }
 
 func (p participation) clone(db *gorm.DB) participation {
