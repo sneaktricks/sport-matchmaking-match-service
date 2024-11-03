@@ -29,24 +29,24 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: postgres-credentials
-                key: PGUSER
+                key: user
           - name: PGPASSWORD
             valueFrom:
               secretKeyRef:
                 name: postgres-credentials
-                key: PGPASSWORD
+                key: password
           - name: PGHOST
             valueFrom:
               secretKeyRef:
                 name: postgres-credentials
-                key: PGHOST
+                key: host
           - name: PGPORT
             valueFrom:
               secretKeyRef:
                 name: postgres-credentials
-                key: PGPORT
+                key: port
           - name: PGDATABASE
             valueFrom:
               secretKeyRef:
                 name: postgres-credentials
-                key: PGDATABASE
+                key: database
