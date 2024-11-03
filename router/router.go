@@ -10,7 +10,7 @@ func New() *echo.Echo {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.Logger())
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORS()) // TODO: Configure CORS for production
 	e.Validator = NewValidator()
 
 	return e
