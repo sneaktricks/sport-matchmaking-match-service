@@ -38,9 +38,9 @@ func main() {
 	goCloakClient := auth.NewGoCloakClient()
 
 	// Create router and handler
-	r := router.New(goCloakClient)
+	r := router.New()
 	g := r.Group("")
-	h := handler.New(matchStore, participationStore)
+	h := handler.New(goCloakClient, matchStore, participationStore)
 
 	// Register routes to router main group
 	h.RegisterRoutes(g)

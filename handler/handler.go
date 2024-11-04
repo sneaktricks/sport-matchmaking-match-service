@@ -4,18 +4,23 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Nerzal/gocloak/v13"
 	"github.com/labstack/echo/v4"
+	"github.com/sneaktricks/sport-matchmaking-match-service/middleware"
 	"github.com/sneaktricks/sport-matchmaking-match-service/model"
 	"github.com/sneaktricks/sport-matchmaking-match-service/store"
 )
 
 type Handler struct {
+	goCloakClient *gocloak.GoCloak
+
 	matchStore         store.MatchStore
 	participationStore store.ParticipationStore
 }
 
-func New(ms store.MatchStore, ps store.ParticipationStore) *Handler {
+func New(goCloakClient *gocloak.GoCloak, ms store.MatchStore, ps store.ParticipationStore) *Handler {
 	return &Handler{
+		goCloakClient:      goCloakClient,
 		matchStore:         ms,
 		participationStore: ps,
 	}
@@ -30,14 +35,16 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 		return c.JSON(http.StatusOK, model.TimeResponse{Time: time.Now().UTC()})
 	})
 
+	authMiddleware := middleware.AuthMiddleware(h.goCloakClient)
+
 	matchGroup := g.Group("/matches")
 	matchGroup.GET("", h.FindMatches)
 	matchGroup.GET("/:id", h.FindMatchByID)
-	matchGroup.POST("", h.CreateMatch)
-	matchGroup.PUT("/:id", h.EditMatch)
-	matchGroup.DELETE("/:id", h.DeleteMatch)
+	matchGroup.POST("", h.CreateMatch, authMiddleware)
+	matchGroup.PUT("/:id", h.EditMatch, authMiddleware)
+	matchGroup.DELETE("/:id", h.DeleteMatch, authMiddleware)
 
 	matchGroup.GET("/:id/participants", h.FindParticipationsInMatch)
-	matchGroup.POST("/:id/participants", h.CreateParticipation)
-	matchGroup.DELETE("/:id/participants", h.DeleteParticipation)
+	matchGroup.POST("/:id/participants", h.CreateParticipation, authMiddleware)
+	matchGroup.DELETE("/:id/participants", h.DeleteParticipation, authMiddleware)
 }
