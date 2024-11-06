@@ -89,7 +89,7 @@ func (ms *GormMatchStore) Create(ctx context.Context, createData model.MatchCrea
 	m := ms.q.Match
 
 	dbMatch := createData.Match()
-	dbMatch.HostUserID = uuid.UUID{} // TODO: Replace this hardcoded ID with actual user ID
+	dbMatch.HostUserID = hostUserID
 
 	if err := m.WithContext(ctx).Create(&dbMatch); err != nil {
 		return model.MatchDTO{}, nil

@@ -50,3 +50,23 @@ spec:
               secretKeyRef:
                 name: postgres-credentials
                 key: database
+          - name: KEYCLOAK_URL
+            valueFrom:
+              secretKeyRef:
+                name: keycloak-credentials
+                key: url
+          - name: KEYCLOAK_REALM
+            valueFrom:
+              secretKeyRef:
+                name: keycloak-credentials
+                key: realm
+          - name: KEYCLOAK_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: keycloak-credentials
+                key: clientId
+          - name: KEYCLOAK_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: keycloak-credentials
+                key: clientSecret

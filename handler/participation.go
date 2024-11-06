@@ -49,14 +49,18 @@ func (h *Handler) FindParticipationsInMatch(c echo.Context) error {
 }
 
 func (h *Handler) CreateParticipation(c echo.Context) error {
+	// Get user ID
+	userID, ok := c.Get("user").(uuid.UUID)
+	if !ok {
+		return HTTPError(ErrInvalidID)
+	}
+
 	// Bind ID
 	var matchID uuid.UUID
 	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &matchID).BindError()
 	if err != nil {
 		return HTTPError(ErrInvalidID)
 	}
-
-	userID := uuid.UUID{} // TODO: Replace this with real user ID parsed from auth token claims
 
 	participation, err := h.participationStore.Create(
 		c.Request().Context(),
@@ -75,14 +79,18 @@ func (h *Handler) CreateParticipation(c echo.Context) error {
 }
 
 func (h *Handler) DeleteParticipation(c echo.Context) error {
+	// Get user ID
+	userID, ok := c.Get("user").(uuid.UUID)
+	if !ok {
+		return HTTPError(ErrInvalidID)
+	}
+
 	// Bind matchID
 	var matchID uuid.UUID
 	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &matchID).BindError()
 	if err != nil {
 		return HTTPError(ErrInvalidID)
 	}
-
-	userID := uuid.UUID{} // TODO: Replace this with real user ID parsed from auth token claims
 
 	err = h.participationStore.Delete(
 		c.Request().Context(),

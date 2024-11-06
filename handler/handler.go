@@ -6,6 +6,7 @@ import (
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/labstack/echo/v4"
+	"github.com/sneaktricks/sport-matchmaking-match-service/auth"
 	"github.com/sneaktricks/sport-matchmaking-match-service/middleware"
 	"github.com/sneaktricks/sport-matchmaking-match-service/model"
 	"github.com/sneaktricks/sport-matchmaking-match-service/store"
@@ -33,6 +34,17 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 
 	g.GET("/time", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, model.TimeResponse{Time: time.Now().UTC()})
+	})
+
+	// TODO: Remove this endpoint
+	g.GET("/test", func(c echo.Context) error {
+		username := c.QueryParam("username")
+		password := c.QueryParam("password")
+		jwt, err := h.goCloakClient.Login(c.Request().Context(), auth.ClientID, auth.ClientSecret, auth.Realm, username, password)
+		if err != nil {
+			return c.JSON(400, err)
+		}
+		return c.JSON(http.StatusOK, jwt)
 	})
 
 	authMiddleware := middleware.AuthMiddleware(h.goCloakClient)

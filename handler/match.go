@@ -66,6 +66,12 @@ func (h *Handler) FindMatchByID(c echo.Context) error {
 }
 
 func (h *Handler) CreateMatch(c echo.Context) error {
+	// Get user ID
+	userID, ok := c.Get("user").(uuid.UUID)
+	if !ok {
+		return HTTPError(ErrInvalidID)
+	}
+
 	createData := model.MatchCreate{}
 
 	if err := c.Bind(&createData); err != nil {
@@ -78,7 +84,7 @@ func (h *Handler) CreateMatch(c echo.Context) error {
 	match, err := h.matchStore.Create(
 		c.Request().Context(),
 		createData,
-		uuid.UUID{}, // TODO: Replace this hardcoded UUID with real user ID
+		userID,
 	)
 	if err != nil {
 		log.Logger.Error(
@@ -92,6 +98,13 @@ func (h *Handler) CreateMatch(c echo.Context) error {
 }
 
 func (h *Handler) EditMatch(c echo.Context) error {
+	// Get user ID
+	// userID, ok := c.Get("user").(uuid.UUID)
+	// if !ok {
+	// 	return HTTPError(ErrInvalidID)
+	// }
+	// TODO: Check user permission to edit this resource
+
 	// Bind ID
 	var id uuid.UUID
 	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &id).BindError()
@@ -125,6 +138,13 @@ func (h *Handler) EditMatch(c echo.Context) error {
 }
 
 func (h *Handler) DeleteMatch(c echo.Context) error {
+	// Get user ID
+	// userID, ok := c.Get("user").(uuid.UUID)
+	// if !ok {
+	// 	return HTTPError(ErrInvalidID)
+	// }
+	// TODO: Check user permission to edit this resource
+
 	// Bind ID
 	var id uuid.UUID
 	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &id).BindError()
