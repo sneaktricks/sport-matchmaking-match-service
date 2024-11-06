@@ -94,16 +94,27 @@ func (h *Handler) CreateMatch(c echo.Context) error {
 		return HTTPError(err)
 	}
 
+	// Add host to the match
+	_, err = h.participationStore.Create(c.Request().Context(), match.ID, userID)
+	if err != nil {
+		log.Logger.Error(
+			"failed to add host to match",
+			slog.String("error", err.Error()),
+		)
+		return HTTPError(err)
+	}
+
 	return c.JSON(http.StatusCreated, match)
 }
 
 func (h *Handler) EditMatch(c echo.Context) error {
 	// Get user ID
-	// userID, ok := c.Get("user").(uuid.UUID)
-	// if !ok {
-	// 	return HTTPError(ErrInvalidID)
-	// }
-	// TODO: Check user permission to edit this resource
+	userID, ok := c.Get("user").(uuid.UUID)
+	if !ok {
+		return HTTPError(ErrInvalidID)
+	}
+
+	// Might be a better idea to utilize Keycloak permissions instead
 
 	// Bind ID
 	var id uuid.UUID
@@ -125,6 +136,7 @@ func (h *Handler) EditMatch(c echo.Context) error {
 		c.Request().Context(),
 		id,
 		editData,
+		userID,
 	)
 	if err != nil {
 		log.Logger.Warn(
@@ -139,11 +151,12 @@ func (h *Handler) EditMatch(c echo.Context) error {
 
 func (h *Handler) DeleteMatch(c echo.Context) error {
 	// Get user ID
-	// userID, ok := c.Get("user").(uuid.UUID)
-	// if !ok {
-	// 	return HTTPError(ErrInvalidID)
-	// }
-	// TODO: Check user permission to edit this resource
+	userID, ok := c.Get("user").(uuid.UUID)
+	if !ok {
+		return HTTPError(ErrInvalidID)
+	}
+
+	// Might be a better idea to utilize Keycloak permissions instead
 
 	// Bind ID
 	var id uuid.UUID
@@ -155,6 +168,7 @@ func (h *Handler) DeleteMatch(c echo.Context) error {
 	err = h.matchStore.Delete(
 		c.Request().Context(),
 		id,
+		userID,
 	)
 	if err != nil {
 		log.Logger.Warn(
