@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/sneaktricks/sport-matchmaking-match-service/auth"
 	"github.com/sneaktricks/sport-matchmaking-match-service/dal"
 	"github.com/sneaktricks/sport-matchmaking-match-service/database"
 	"github.com/sneaktricks/sport-matchmaking-match-service/handler"
@@ -33,10 +34,19 @@ func main() {
 	matchStore := store.NewGormMatchStore(dal.Q)
 	participationStore := store.NewGormParticipationStore(dal.Q)
 
+	// Create GoCloak client
+	goCloakClient := auth.NewGoCloakClient()
+
+	// Initialize OIDC provider
+	oidcProvider, err := auth.NewOIDCProvider()
+	if err != nil {
+		stdlog.Fatalf("Failed to initialize OIDC provider: %s", err.Error())
+	}
+
 	// Create router and handler
 	r := router.New()
 	g := r.Group("")
-	h := handler.New(matchStore, participationStore)
+	h := handler.New(goCloakClient, oidcProvider, matchStore, participationStore)
 
 	// Register routes to router main group
 	h.RegisterRoutes(g)
@@ -47,7 +57,7 @@ func main() {
 	})
 
 	// Start the server
-	err := r.Start(fmt.Sprintf(":%d", *port))
+	err = r.Start(fmt.Sprintf(":%d", *port))
 	if err != http.ErrServerClosed {
 		r.Logger.Fatal(err)
 	}

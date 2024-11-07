@@ -19,8 +19,8 @@ type MatchStore interface {
 	FindAll(ctx context.Context, page, limit uint, sportFilter []string, startsAfter time.Time) (matches []model.MatchDTO, err error)
 	FindByID(ctx context.Context, id uuid.UUID) (match model.MatchDTO, err error)
 	Create(ctx context.Context, createData model.MatchCreate, hostUserID uuid.UUID) (match model.MatchDTO, err error)
-	Edit(ctx context.Context, id uuid.UUID, editData model.MatchEdit) error
-	Delete(ctx context.Context, id uuid.UUID) error
+	Edit(ctx context.Context, id uuid.UUID, editData model.MatchEdit, hostUserID uuid.UUID) error
+	Delete(ctx context.Context, id uuid.UUID, hostUserID uuid.UUID) error
 }
 
 type GormMatchStore struct {
@@ -89,7 +89,7 @@ func (ms *GormMatchStore) Create(ctx context.Context, createData model.MatchCrea
 	m := ms.q.Match
 
 	dbMatch := createData.Match()
-	dbMatch.HostUserID = uuid.UUID{} // TODO: Replace this hardcoded ID with actual user ID
+	dbMatch.HostUserID = hostUserID
 
 	if err := m.WithContext(ctx).Create(&dbMatch); err != nil {
 		return model.MatchDTO{}, nil
@@ -99,11 +99,11 @@ func (ms *GormMatchStore) Create(ctx context.Context, createData model.MatchCrea
 	return match, nil
 }
 
-func (ms *GormMatchStore) Edit(ctx context.Context, id uuid.UUID, editData model.MatchEdit) error {
+func (ms *GormMatchStore) Edit(ctx context.Context, id uuid.UUID, editData model.MatchEdit, hostUserID uuid.UUID) error {
 	m := ms.q.Match
 
 	dbMatch := editData.Match()
-	result, err := m.WithContext(ctx).Where(m.ID.Eq(id)).Updates(dbMatch)
+	result, err := m.WithContext(ctx).Where(m.ID.Eq(id), m.HostUserID.Eq(hostUserID)).Updates(dbMatch)
 	if err != nil {
 		return err
 	}
@@ -114,10 +114,10 @@ func (ms *GormMatchStore) Edit(ctx context.Context, id uuid.UUID, editData model
 	return nil
 }
 
-func (ms *GormMatchStore) Delete(ctx context.Context, id uuid.UUID) error {
+func (ms *GormMatchStore) Delete(ctx context.Context, id uuid.UUID, hostUserID uuid.UUID) error {
 	m := ms.q.Match
 
-	result, err := m.WithContext(ctx).Where(m.ID.Eq(id)).Delete()
+	result, err := m.WithContext(ctx).Where(m.ID.Eq(id), m.HostUserID.Eq(hostUserID)).Delete()
 	if err != nil {
 		return err
 	}

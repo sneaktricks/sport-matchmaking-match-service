@@ -21,3 +21,5 @@ COPY --from=builder /go/bin/app/sport-matchmaking-match-service /app
 ENTRYPOINT [ "/app", "--port", "8080" ]
 
 EXPOSE 8080
+
+LABEL Name="sport-matchmaking-match-service"
