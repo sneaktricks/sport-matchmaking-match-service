@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Nerzal/gocloak/v13"
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/labstack/echo/v4"
 	"github.com/sneaktricks/sport-matchmaking-match-service/auth"
 	"github.com/sneaktricks/sport-matchmaking-match-service/middleware"
@@ -14,14 +15,16 @@ import (
 
 type Handler struct {
 	goCloakClient *gocloak.GoCloak
+	oidcProvider  *oidc.Provider
 
 	matchStore         store.MatchStore
 	participationStore store.ParticipationStore
 }
 
-func New(goCloakClient *gocloak.GoCloak, ms store.MatchStore, ps store.ParticipationStore) *Handler {
+func New(goCloakClient *gocloak.GoCloak, oidcProvider *oidc.Provider, ms store.MatchStore, ps store.ParticipationStore) *Handler {
 	return &Handler{
 		goCloakClient:      goCloakClient,
+		oidcProvider:       oidcProvider,
 		matchStore:         ms,
 		participationStore: ps,
 	}
@@ -47,16 +50,19 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 		return c.JSON(http.StatusOK, jwt)
 	})
 
-	authMiddleware := middleware.AuthMiddleware(h.goCloakClient)
+	// authMiddleware := middleware.AuthMiddleware(h.goCloakClient)
+	oidcMiddleware := middleware.AuthMiddlewareOIDC(
+		h.oidcProvider.Verifier(auth.GetOIDCVerifierConfig()),
+	)
 
 	matchGroup := g.Group("/matches")
 	matchGroup.GET("", h.FindMatches)
 	matchGroup.GET("/:id", h.FindMatchByID)
-	matchGroup.POST("", h.CreateMatch, authMiddleware)
-	matchGroup.PUT("/:id", h.EditMatch, authMiddleware)
-	matchGroup.DELETE("/:id", h.DeleteMatch, authMiddleware)
+	matchGroup.POST("", h.CreateMatch, oidcMiddleware)
+	matchGroup.PUT("/:id", h.EditMatch, oidcMiddleware)
+	matchGroup.DELETE("/:id", h.DeleteMatch, oidcMiddleware)
 
 	matchGroup.GET("/:id/participants", h.FindParticipationsInMatch)
-	matchGroup.POST("/:id/participants", h.CreateParticipation, authMiddleware)
-	matchGroup.DELETE("/:id/participants", h.DeleteParticipation, authMiddleware)
+	matchGroup.POST("/:id/participants", h.CreateParticipation, oidcMiddleware)
+	matchGroup.DELETE("/:id/participants", h.DeleteParticipation, oidcMiddleware)
 }
