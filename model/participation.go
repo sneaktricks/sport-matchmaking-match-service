@@ -8,7 +8,7 @@ import (
 )
 
 type Participation struct {
-	UserID  uuid.UUID `gorm:"type:uuid;primaryKey"`
+	UserID  string    `gorm:"type:uuid;primaryKey"`
 	MatchID uuid.UUID `gorm:"type:uuid;primaryKey"`
 
 	CreatedAt time.Time
@@ -26,7 +26,7 @@ func (p *Participation) ParticipationDTO() ParticipationDTO {
 }
 
 type ParticipationDTO struct {
-	UserID  uuid.UUID `json:"userId"`
+	UserID  string    `json:"userId"`
 	MatchID uuid.UUID `json:"matchId"`
 
 	CreatedAt time.Time `json:"createdAt"`

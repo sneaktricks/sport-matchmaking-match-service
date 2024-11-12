@@ -22,7 +22,7 @@ type Match struct {
 	RequiredEquipment pq.StringArray `gorm:"type:text[]"`
 	Level             string
 	ChatLink          string
-	HostUserID        uuid.UUID
+	HostUserID        string
 	Participations    []Participation `gorm:"foreignKey:MatchID"`
 }
 
@@ -59,7 +59,7 @@ type MatchDTO struct {
 	RequiredEquipment []string  `json:"requiredEquipment"`
 	Level             string    `json:"level"`
 	ChatLink          string    `json:"chatLink"`
-	HostUserID        uuid.UUID `json:"hostUserId"`
+	HostUserID        string    `json:"hostUserId"`
 
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`

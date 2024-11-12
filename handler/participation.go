@@ -50,7 +50,7 @@ func (h *Handler) FindParticipationsInMatch(c echo.Context) error {
 
 func (h *Handler) CreateParticipation(c echo.Context) error {
 	// Get user ID
-	userID, ok := c.Get("user").(uuid.UUID)
+	userID, ok := c.Get("user").(string)
 	if !ok {
 		return HTTPError(ErrInvalidID)
 	}
@@ -80,7 +80,7 @@ func (h *Handler) CreateParticipation(c echo.Context) error {
 
 func (h *Handler) DeleteParticipation(c echo.Context) error {
 	// Get user ID
-	userID, ok := c.Get("user").(uuid.UUID)
+	userID, ok := c.Get("user").(string)
 	if !ok {
 		return HTTPError(ErrInvalidID)
 	}
