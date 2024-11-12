@@ -18,8 +18,8 @@ var (
 
 type ParticipationStore interface {
 	FindAllInMatch(ctx context.Context, matchID uuid.UUID, page, limit uint) (participations []model.ParticipationDTO, err error)
-	Create(ctx context.Context, matchID, userID uuid.UUID) (participation model.ParticipationDTO, err error)
-	Delete(ctx context.Context, matchID, userID uuid.UUID) error
+	Create(ctx context.Context, matchID uuid.UUID, userID string) (participation model.ParticipationDTO, err error)
+	Delete(ctx context.Context, matchID uuid.UUID, userID string) error
 }
 
 type GormParticipationStore struct {
@@ -63,7 +63,7 @@ func (ps *GormParticipationStore) FindAllInMatch(ctx context.Context, matchID uu
 	return participations, nil
 }
 
-func (ps *GormParticipationStore) Create(ctx context.Context, matchID uuid.UUID, userID uuid.UUID) (participation model.ParticipationDTO, err error) {
+func (ps *GormParticipationStore) Create(ctx context.Context, matchID uuid.UUID, userID string) (participation model.ParticipationDTO, err error) {
 	p := ps.q.Participation
 
 	m := ps.q.Match
@@ -96,7 +96,7 @@ func (ps *GormParticipationStore) Create(ctx context.Context, matchID uuid.UUID,
 	return dbParticipation.ParticipationDTO(), nil
 }
 
-func (ps *GormParticipationStore) Delete(ctx context.Context, matchID, userID uuid.UUID) error {
+func (ps *GormParticipationStore) Delete(ctx context.Context, matchID uuid.UUID, userID string) error {
 	p := ps.q.Participation
 
 	result, err := p.WithContext(ctx).Where(p.MatchID.Eq(matchID), p.UserID.Eq(userID)).Delete()

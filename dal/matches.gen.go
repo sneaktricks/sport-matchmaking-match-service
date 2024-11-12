@@ -42,7 +42,7 @@ func newMatch(db *gorm.DB, opts ...gen.DOOption) match {
 	_match.RequiredEquipment = field.NewField(tableName, "required_equipment")
 	_match.Level = field.NewString(tableName, "level")
 	_match.ChatLink = field.NewString(tableName, "chat_link")
-	_match.HostUserID = field.NewField(tableName, "host_user_id")
+	_match.HostUserID = field.NewString(tableName, "host_user_id")
 	_match.Participations = matchHasManyParticipations{
 		db: db.Session(&gorm.Session{}),
 
@@ -73,7 +73,7 @@ type match struct {
 	RequiredEquipment field.Field
 	Level             field.String
 	ChatLink          field.String
-	HostUserID        field.Field
+	HostUserID        field.String
 	Participations    matchHasManyParticipations
 
 	fieldMap map[string]field.Expr
@@ -106,7 +106,7 @@ func (m *match) updateTableName(table string) *match {
 	m.RequiredEquipment = field.NewField(table, "required_equipment")
 	m.Level = field.NewString(table, "level")
 	m.ChatLink = field.NewString(table, "chat_link")
-	m.HostUserID = field.NewField(table, "host_user_id")
+	m.HostUserID = field.NewString(table, "host_user_id")
 
 	m.fillFieldMap()
 

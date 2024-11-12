@@ -67,7 +67,7 @@ func (h *Handler) FindMatchByID(c echo.Context) error {
 
 func (h *Handler) CreateMatch(c echo.Context) error {
 	// Get user ID
-	userID, ok := c.Get("user").(uuid.UUID)
+	userID, ok := c.Get("user").(string)
 	if !ok {
 		return HTTPError(ErrInvalidID)
 	}
@@ -109,7 +109,7 @@ func (h *Handler) CreateMatch(c echo.Context) error {
 
 func (h *Handler) EditMatch(c echo.Context) error {
 	// Get user ID
-	userID, ok := c.Get("user").(uuid.UUID)
+	userID, ok := c.Get("user").(string)
 	if !ok {
 		return HTTPError(ErrInvalidID)
 	}
@@ -151,7 +151,7 @@ func (h *Handler) EditMatch(c echo.Context) error {
 
 func (h *Handler) DeleteMatch(c echo.Context) error {
 	// Get user ID
-	userID, ok := c.Get("user").(uuid.UUID)
+	userID, ok := c.Get("user").(string)
 	if !ok {
 		return HTTPError(ErrInvalidID)
 	}
