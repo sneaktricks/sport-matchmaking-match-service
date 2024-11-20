@@ -46,7 +46,8 @@ func (nc *SMNotificationClient) NotifyUsersAboutMatchUpdate(details *Notificatio
 	}
 
 	// Send notification request
-	resp, err := http.Post(smNotificationServiceURL, echo.MIMEApplicationJSON, reqBody)
+	url := fmt.Sprintf("%s/notify", smNotificationServiceURL)
+	resp, err := http.Post(url, echo.MIMEApplicationJSON, reqBody)
 	if err != nil {
 		return fmt.Errorf("SM notification client: notification request failed: %w", err)
 	}

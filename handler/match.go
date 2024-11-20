@@ -160,10 +160,13 @@ func (h *Handler) EditMatch(c echo.Context) error {
 			userIDs[i] = p.UserID
 		}
 
-		h.notificationClient.NotifyUsersAboutMatchUpdate(&notification.NotificationDetails{
+		err = h.notificationClient.NotifyUsersAboutMatchUpdate(&notification.NotificationDetails{
 			MatchDetails: m.MatchDTO,
 			UserIDs:      userIDs,
 		})
+		if err != nil {
+			slog.Warn("failed to notify participants", slog.String("error", err.Error()))
+		}
 	}()
 
 	return c.NoContent(http.StatusNoContent)

@@ -25,6 +25,8 @@ spec:
         ports:
         - containerPort: 8080
         env:
+          - name: NOTIFICATION_SERVICE_URL
+            value: "http://sport-matchmaking-notification-service-service:8080"
           - name: PGUSER
             valueFrom:
               secretKeyRef:
