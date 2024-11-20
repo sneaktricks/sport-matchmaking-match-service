@@ -8,23 +8,26 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/labstack/echo/v4"
 	"github.com/sneaktricks/sport-matchmaking-match-service/auth"
+	"github.com/sneaktricks/sport-matchmaking-match-service/integrations/notification"
 	"github.com/sneaktricks/sport-matchmaking-match-service/middleware"
 	"github.com/sneaktricks/sport-matchmaking-match-service/model"
 	"github.com/sneaktricks/sport-matchmaking-match-service/store"
 )
 
 type Handler struct {
-	goCloakClient *gocloak.GoCloak
-	oidcProvider  *oidc.Provider
+	goCloakClient      *gocloak.GoCloak
+	oidcProvider       *oidc.Provider
+	notificationClient notification.NotificationClient
 
 	matchStore         store.MatchStore
 	participationStore store.ParticipationStore
 }
 
-func New(goCloakClient *gocloak.GoCloak, oidcProvider *oidc.Provider, ms store.MatchStore, ps store.ParticipationStore) *Handler {
+func New(goCloakClient *gocloak.GoCloak, oidcProvider *oidc.Provider, notificationClient notification.NotificationClient, ms store.MatchStore, ps store.ParticipationStore) *Handler {
 	return &Handler{
 		goCloakClient:      goCloakClient,
 		oidcProvider:       oidcProvider,
+		notificationClient: notificationClient,
 		matchStore:         ms,
 		participationStore: ps,
 	}

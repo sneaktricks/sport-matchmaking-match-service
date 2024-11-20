@@ -18,6 +18,7 @@ var (
 type MatchStore interface {
 	FindAll(ctx context.Context, page, limit uint, sportFilter []string, startsAfter time.Time) (matches []model.MatchDTO, err error)
 	FindByID(ctx context.Context, id uuid.UUID) (match model.MatchDTO, err error)
+	FindMatchWithParticipations(ctx context.Context, id uuid.UUID) (match model.MatchWithParticipationsDTO, err error)
 	Create(ctx context.Context, createData model.MatchCreate, hostUserID string) (match model.MatchDTO, err error)
 	Edit(ctx context.Context, id uuid.UUID, editData model.MatchEdit, hostUserID string) error
 	Delete(ctx context.Context, id uuid.UUID, hostUserID string) error
@@ -81,6 +82,20 @@ func (ms *GormMatchStore) FindByID(ctx context.Context, id uuid.UUID) (match mod
 		return model.MatchDTO{}, err
 	}
 	match = dbMatch.MatchDTO()
+
+	return match, nil
+}
+
+func (ms *GormMatchStore) FindMatchWithParticipations(ctx context.Context, id uuid.UUID) (match model.MatchWithParticipationsDTO, err error) {
+	m := ms.q.Match
+	dbMatch, err := m.WithContext(ctx).Where(m.ID.Eq(id)).Preload(m.Participations).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.MatchWithParticipationsDTO{}, ErrMatchNotFound
+		}
+		return model.MatchWithParticipationsDTO{}, err
+	}
+	match = dbMatch.MatchWithParticipationsDTO()
 
 	return match, nil
 }

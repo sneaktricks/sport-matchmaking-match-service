@@ -14,6 +14,7 @@ import (
 	"github.com/sneaktricks/sport-matchmaking-match-service/dal"
 	"github.com/sneaktricks/sport-matchmaking-match-service/database"
 	"github.com/sneaktricks/sport-matchmaking-match-service/handler"
+	"github.com/sneaktricks/sport-matchmaking-match-service/integrations/notification"
 	"github.com/sneaktricks/sport-matchmaking-match-service/log"
 	"github.com/sneaktricks/sport-matchmaking-match-service/router"
 	"github.com/sneaktricks/sport-matchmaking-match-service/store"
@@ -43,10 +44,16 @@ func main() {
 		stdlog.Fatalf("Failed to initialize OIDC provider: %s", err.Error())
 	}
 
+	// Create notification client
+	notificationClient, err := notification.NewSMNotificationClient()
+	if err != nil {
+		stdlog.Fatalf("Failed to create notification client: %s", err.Error())
+	}
+
 	// Create router and handler
 	r := router.New()
 	g := r.Group("")
-	h := handler.New(goCloakClient, oidcProvider, matchStore, participationStore)
+	h := handler.New(goCloakClient, oidcProvider, notificationClient, matchStore, participationStore)
 
 	// Register routes to router main group
 	h.RegisterRoutes(g)

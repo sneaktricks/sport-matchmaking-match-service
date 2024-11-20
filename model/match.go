@@ -46,6 +46,13 @@ func (m *Match) MatchDTO() MatchDTO {
 	}
 }
 
+func (m *Match) MatchWithParticipationsDTO() MatchWithParticipationsDTO {
+	return MatchWithParticipationsDTO{
+		MatchDTO:       m.MatchDTO(),
+		Participations: Participations(m.Participations).ParticipationDTOs(),
+	}
+}
+
 type MatchDTO struct {
 	ID                uuid.UUID `json:"id"`
 	Sport             string    `json:"sport"`
@@ -63,6 +70,11 @@ type MatchDTO struct {
 
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type MatchWithParticipationsDTO struct {
+	MatchDTO
+	Participations []ParticipationDTO `json:"participations"`
 }
 
 type MatchCreate struct {
