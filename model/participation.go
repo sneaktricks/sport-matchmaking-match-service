@@ -32,3 +32,14 @@ type ParticipationDTO struct {
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
+
+type Participations []Participation
+
+func (p Participations) ParticipationDTOs() []ParticipationDTO {
+	dtos := make([]ParticipationDTO, len(p))
+	for i, participation := range p {
+		dtos[i] = participation.ParticipationDTO()
+	}
+
+	return dtos
+}

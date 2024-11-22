@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/sneaktricks/sport-matchmaking-match-service/integrations/notification"
 	"github.com/sneaktricks/sport-matchmaking-match-service/log"
 	"github.com/sneaktricks/sport-matchmaking-match-service/model"
 	"github.com/sneaktricks/sport-matchmaking-match-service/model/query"
@@ -145,6 +146,28 @@ func (h *Handler) EditMatch(c echo.Context) error {
 		)
 		return HTTPError(err)
 	}
+
+	// Send notifications to users in a separate goroutine
+	go func() {
+		ctx := context.Background()
+		m, err := h.matchStore.FindMatchWithParticipations(ctx, id)
+		if err != nil {
+			slog.Warn("failed to fetch match to notify users of update", slog.String("error", err.Error()))
+			return
+		}
+		userIDs := make([]string, len(m.Participations))
+		for i, p := range m.Participations {
+			userIDs[i] = p.UserID
+		}
+
+		err = h.notificationClient.NotifyUsersAboutMatchUpdate(&notification.NotificationDetails{
+			MatchDetails: m.MatchDTO,
+			UserIDs:      userIDs,
+		})
+		if err != nil {
+			slog.Warn("failed to notify participants", slog.String("error", err.Error()))
+		}
+	}()
 
 	return c.NoContent(http.StatusNoContent)
 }
