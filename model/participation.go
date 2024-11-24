@@ -8,7 +8,7 @@ import (
 )
 
 type Participation struct {
-	UserID  string    `gorm:"type:uuid;primaryKey"`
+	UserID  string    `gorm:"primaryKey"`
 	MatchID uuid.UUID `gorm:"type:uuid;primaryKey"`
 
 	CreatedAt time.Time
