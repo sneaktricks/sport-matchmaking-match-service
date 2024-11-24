@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/sneaktricks/sport-matchmaking-match-service/log"
 )
 
 var (
@@ -35,6 +36,10 @@ func checkEnv() error {
 }
 
 func NewOIDCProvider() (provider *oidc.Provider, err error) {
+	if err := checkEnv(); err != nil {
+		log.Logger.Error(err.Error())
+	}
+
 	provider, err = oidc.NewProvider(
 		context.Background(),
 		fmt.Sprintf("%s/realms/%s", KeycloakURL, Realm),
