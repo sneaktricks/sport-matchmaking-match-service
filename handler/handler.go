@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Nerzal/gocloak/v13"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/labstack/echo/v4"
 	"github.com/sneaktricks/sport-matchmaking-match-service/auth"
@@ -15,7 +14,6 @@ import (
 )
 
 type Handler struct {
-	goCloakClient      *gocloak.GoCloak
 	oidcProvider       *oidc.Provider
 	notificationClient notification.NotificationClient
 
@@ -23,9 +21,8 @@ type Handler struct {
 	participationStore store.ParticipationStore
 }
 
-func New(goCloakClient *gocloak.GoCloak, oidcProvider *oidc.Provider, notificationClient notification.NotificationClient, ms store.MatchStore, ps store.ParticipationStore) *Handler {
+func New(oidcProvider *oidc.Provider, notificationClient notification.NotificationClient, ms store.MatchStore, ps store.ParticipationStore) *Handler {
 	return &Handler{
-		goCloakClient:      goCloakClient,
 		oidcProvider:       oidcProvider,
 		notificationClient: notificationClient,
 		matchStore:         ms,
@@ -35,37 +32,25 @@ func New(goCloakClient *gocloak.GoCloak, oidcProvider *oidc.Provider, notificati
 
 func (h *Handler) RegisterRoutes(g *echo.Group) {
 	g.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello world!")
+		return c.String(http.StatusOK, "Sport Matchmaking Match Service API")
 	})
 
 	g.GET("/time", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, model.TimeResponse{Time: time.Now().UTC()})
 	})
 
-	// TODO: Remove this endpoint
-	g.GET("/test", func(c echo.Context) error {
-		username := c.QueryParam("username")
-		password := c.QueryParam("password")
-		jwt, err := h.goCloakClient.Login(c.Request().Context(), auth.ClientID, auth.ClientSecret, auth.Realm, username, password)
-		if err != nil {
-			return c.JSON(400, err)
-		}
-		return c.JSON(http.StatusOK, jwt)
-	})
-
-	// authMiddleware := middleware.AuthMiddleware(h.goCloakClient)
-	oidcMiddleware := middleware.AuthMiddlewareOIDC(
+	authMiddleware := middleware.AuthMiddleware(
 		h.oidcProvider.Verifier(auth.GetOIDCVerifierConfig()),
 	)
 
 	matchGroup := g.Group("/matches")
 	matchGroup.GET("", h.FindMatches)
 	matchGroup.GET("/:id", h.FindMatchByID)
-	matchGroup.POST("", h.CreateMatch, oidcMiddleware)
-	matchGroup.PUT("/:id", h.EditMatch, oidcMiddleware)
-	matchGroup.DELETE("/:id", h.DeleteMatch, oidcMiddleware)
+	matchGroup.POST("", h.CreateMatch, authMiddleware)
+	matchGroup.PUT("/:id", h.EditMatch, authMiddleware)
+	matchGroup.DELETE("/:id", h.DeleteMatch, authMiddleware)
 
 	matchGroup.GET("/:id/participants", h.FindParticipationsInMatch)
-	matchGroup.POST("/:id/participants", h.CreateParticipation, oidcMiddleware)
-	matchGroup.DELETE("/:id/participants", h.DeleteParticipation, oidcMiddleware)
+	matchGroup.POST("/:id/participants", h.CreateParticipation, authMiddleware)
+	matchGroup.DELETE("/:id/participants", h.DeleteParticipation, authMiddleware)
 }

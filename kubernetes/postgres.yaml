@@ -18,7 +18,7 @@ spec:
           image: postgres:17
           volumeMounts:
             - mountPath: /data
-              name: cache-volume
+              name: data-volume
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -36,8 +36,9 @@ spec:
                   name: postgres-credentials
                   key: database
       volumes:
-        - name: cache-volume
-          emptyDir: {}
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: sport-matchmaking-db-pvc
 ---
 apiVersion: v1
 kind: Service

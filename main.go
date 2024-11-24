@@ -35,9 +35,6 @@ func main() {
 	matchStore := store.NewGormMatchStore(dal.Q)
 	participationStore := store.NewGormParticipationStore(dal.Q)
 
-	// Create GoCloak client
-	goCloakClient := auth.NewGoCloakClient()
-
 	// Initialize OIDC provider
 	oidcProvider, err := auth.NewOIDCProvider()
 	if err != nil {
@@ -53,7 +50,7 @@ func main() {
 	// Create router and handler
 	r := router.New()
 	g := r.Group("")
-	h := handler.New(goCloakClient, oidcProvider, notificationClient, matchStore, participationStore)
+	h := handler.New(oidcProvider, notificationClient, matchStore, participationStore)
 
 	// Register routes to router main group
 	h.RegisterRoutes(g)
