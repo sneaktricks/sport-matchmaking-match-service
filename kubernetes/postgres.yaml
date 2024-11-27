@@ -35,6 +35,11 @@ spec:
                 secretKeyRef:
                   name: postgres-credentials
                   key: database
+          resources:
+            requests:
+              cpu: "200m"
+            limits:
+              cpu: "400m"
       volumes:
         - name: data-volume
           persistentVolumeClaim:
@@ -47,19 +52,19 @@ metadata:
 spec:
   selector:
     app: sport-matchmaking-postgresql-db
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - port: 5432
     targetPort: 5432
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgres-credentials
-type: Opaque
-data:
-  user: dXNlcg== # user
-  password: cGFzc3dvcmQ= # password
-  host: c3BvcnQtbWF0Y2htYWtpbmctcG9zdGdyZXNxbC1kYg== # sport-matchmaking-postgresql-db
-  port: NTQzMg== # 5432
-  database: ZGF0YWJhc2U= # database
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: postgres-credentials
+# type: Opaque
+# data:
+#   user: dXNlcg== # user
+#   password: cGFzc3dvcmQ= # password
+#   host: c3BvcnQtbWF0Y2htYWtpbmctcG9zdGdyZXNxbC1kYg== # sport-matchmaking-postgresql-db
+#   port: NTQzMg== # 5432
+#   database: ZGF0YWJhc2U= # database
