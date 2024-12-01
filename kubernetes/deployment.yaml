@@ -30,6 +30,11 @@ spec:
         env:
           - name: NOTIFICATION_SERVICE_URL
             value: "http://sport-matchmaking-notification-service-service:8080"
+          - name: NOTIFICATION_SERVICE_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: notification-service-match-service-secret
+                key: apiKey
           - name: PGUSER
             valueFrom:
               secretKeyRef:

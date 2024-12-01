@@ -33,6 +33,8 @@ Therefore, the following environment variables must be defined:
 
 - NOTIFICATION_SERVICE_URL
     - The URL where Notification Service can be accessed, e.g. http://sport-matchmaking-notification-service-service:8080
+- NOTIFICATION_SERVICE_API_KEY
+    - API key used to authenticate with notification service
 
 ## Running on Kubernetes
 
@@ -48,5 +50,7 @@ To run Match Service on Kubernetes, the following secrets must be present in the
     - host
     - port
     - database
+- notification-service-match-service-secret
+    - apiKey
 
 With the secrets in place, execute `kubectl apply -f ./kubernetes/` to start the service.
