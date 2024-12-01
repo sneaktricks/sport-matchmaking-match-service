@@ -13,8 +13,10 @@ import (
 )
 
 var (
-	smNotificationServiceURL           = os.Getenv("NOTIFICATION_SERVICE_URL")
-	ErrMissingSMNotificationServiceURL = errors.New("SM notification client: enviroment variable NOTIFICATION_SERVICE_URL is not set")
+	smNotificationServiceURL              = os.Getenv("NOTIFICATION_SERVICE_URL")
+	smNotificationServiceAPIKey           = os.Getenv("NOTIFICATION_SERVICE_API_KEY")
+	ErrMissingSMNotificationServiceURL    = errors.New("SM notification client: environment variable NOTIFICATION_SERVICE_URL is not set")
+	ErrMissingSMNotificationServiceAPIKey = errors.New("SM notification client: environment variable NOTIFICATION_SERVICE_API_KEY is not set")
 )
 
 type NotificationDetails struct {
@@ -26,16 +28,17 @@ type NotificationClient interface {
 	NotifyUsersAboutMatchUpdate(details *NotificationDetails) error
 }
 
-type SMNotificationClient struct {
-	url string
-}
+type SMNotificationClient struct{}
 
 func NewSMNotificationClient() (client *SMNotificationClient, err error) {
 	if smNotificationServiceURL == "" {
 		return nil, ErrMissingSMNotificationServiceURL
 	}
+	if smNotificationServiceAPIKey == "" {
+		return nil, ErrMissingSMNotificationServiceAPIKey
+	}
 
-	return &SMNotificationClient{url: smNotificationServiceURL}, nil
+	return &SMNotificationClient{}, nil
 }
 
 func (nc *SMNotificationClient) NotifyUsersAboutMatchUpdate(details *NotificationDetails) error {
@@ -47,7 +50,15 @@ func (nc *SMNotificationClient) NotifyUsersAboutMatchUpdate(details *Notificatio
 
 	// Send notification request
 	url := fmt.Sprintf("%s/notify", smNotificationServiceURL)
-	resp, err := http.Post(url, echo.MIMEApplicationJSON, reqBody)
+
+	req, err := http.NewRequest(http.MethodPost, url, reqBody)
+	if err != nil {
+		return fmt.Errorf("SM notification client: failed to create request: %w", err)
+	}
+	req.Header.Set("X-API-KEY", smNotificationServiceAPIKey)
+	req.Header.Set("Content-Type", echo.MIMEApplicationJSON)
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("SM notification client: notification request failed: %w", err)
 	}

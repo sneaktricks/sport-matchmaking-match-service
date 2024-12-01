@@ -11,22 +11,30 @@ spec:
       labels:
         app: sport-matchmaking-match-service
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: sport-matchmaking-match-service
         image: sport-matchmaking-match-service:latest
         imagePullPolicy: Never
         resources:
           requests:
-            cpu: 100m
+            cpu: "100m"
             memory: "16Mi"
+            ephemeral-storage: "64Mi"
           limits:
             memory: "128Mi"
             cpu: "500m"
+            ephemeral-storage: "1Gi"
         ports:
         - containerPort: 8080
         env:
           - name: NOTIFICATION_SERVICE_URL
             value: "http://sport-matchmaking-notification-service-service:8080"
+          - name: NOTIFICATION_SERVICE_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: notification-service-match-service-secret
+                key: apiKey
           - name: PGUSER
             valueFrom:
               secretKeyRef:

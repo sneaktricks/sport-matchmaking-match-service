@@ -65,5 +65,7 @@ func Initialize() (db *gorm.DB, err error) {
 	dal.SetDefault(db)
 	dal.Use(db)
 
+	// createInitialData()
+
 	return db, nil
 }
