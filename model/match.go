@@ -88,7 +88,7 @@ type MatchCreate struct {
 	ParticipationFee  int64     `json:"participationFee" validate:"min=0"`
 	RequiredEquipment []string  `json:"requiredEquipment"`
 	Level             string    `json:"level" validate:"required,max=100"`
-	ChatLink          string    `json:"chatLink" validate:"required,max=200"`
+	ChatLink          string    `json:"chatLink" validate:"max=200"`
 }
 
 func (mc *MatchCreate) Match() Match {
