@@ -99,7 +99,7 @@ func (ps *GormParticipationStore) Create(ctx context.Context, matchID uuid.UUID,
 func (ps *GormParticipationStore) Delete(ctx context.Context, matchID uuid.UUID, userID string) error {
 	p := ps.q.Participation
 
-	result, err := p.WithContext(ctx).Where(p.MatchID.Eq(matchID), p.UserID.Eq(userID)).Delete()
+	result, err := p.WithContext(ctx).Unscoped().Where(p.MatchID.Eq(matchID), p.UserID.Eq(userID)).Delete()
 	if err != nil {
 		return err
 	}
